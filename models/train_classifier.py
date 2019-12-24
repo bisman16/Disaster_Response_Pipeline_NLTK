@@ -24,6 +24,15 @@ from sklearn.neighbors import KNeighborsClassifier
 
 
 def load_data(database_filepath):
+    """Loads data from filepath
+    
+    Parameters:
+    database_filepath (str): link to the database file path
+
+    Returns:
+    X, y, category names: features, target, target variable names 
+    
+    """
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table("disaster_messages", con=engine) 
     X = df['message']
@@ -34,12 +43,20 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    
+    """Tokenizes the data
+    Parameters:
+    text: text/string
+
+    Returns:
+    clean_tokens: cleaned token
+    """
+    
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     detected_urls = re.findall(url_regex, text)
     for url in detected_urls:
         text = text.replace(url, "urlplaceholder")
         
-    #text = text.lower()
     text = re.sub(r"[^a-zA-Z0-9]", " ", text)
     words = word_tokenize(text)
     
@@ -58,33 +75,53 @@ def tokenize(text):
 
 
 def build_model():
+    """Returns Grid Search model with AdaBoostClassifier"""
+     
     pipeline_ab = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(AdaBoostClassifier()))
     ])
-    
-    '''
+
     parameters = {
         'clf__estimator__n_estimators': [50, 100],
-        'clf__estimator__learning_rate':[1, 2],
+        'tfidf__use_idf':[True, False]
     }
 
     cv_ab = GridSearchCV(pipeline_ab, param_grid=parameters)
     return cv_ab
-    '''
-    return pipeline_ab
 
 def evaluate_model(model, X_test, y_test, category_names):
+    
+    """Print model results
+    Parameters:
+    model - estimator-object/algorithm
+    X_test - Feature test data
+    y_test - Target test data
+    category_names = required, list of category strings
+    
+    Returns: Classification report
+
+    """
     y_pred = model.predict(X_test)
     print(classification_report(y_test, y_pred, target_names = category_names))
 
 
 def save_model(model, model_filepath):
+    
+    """Save model as pickle file
+    
+    Parameters:
+    model - estimator-object/algorithm
+    model_filepath - filepath to save the pickle file
+    
+    Returns: Saves the pickle file
+    """
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
 def main():
+     """Loads the data, run the model and save the model"""
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
