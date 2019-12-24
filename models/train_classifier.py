@@ -11,7 +11,7 @@ import pickle
 from sqlalchemy import create_engine
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import GridSearchCV
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -71,21 +71,20 @@ def tokenize(text):
 
 
 def build_model():
-    """Returns Grid Search model with AdaBoostClassifier"""
+    """Returns Grid Search model with Logistic Regression"""
      
-    pipeline_ab = Pipeline([
+    pipeline_lr = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(AdaBoostClassifier()))
+        ('clf', MultiOutputClassifier(LogisticRegression(solver = 'lbfgs')))
     ])
 
     parameters = {
-        'clf__estimator__n_estimators': [50, 100],
-        'tfidf__use_idf':[True, False]
+        'clf__estimator__solver': ['newton-cg', 'lbfgs']
     }
 
-    cv_ab = GridSearchCV(pipeline_ab, param_grid=parameters)
-    return cv_ab
+    cv_lr = GridSearchCV(pipeline_lr, param_grid=parameters)
+    return cv_lr
 
 def evaluate_model(model, X_test, y_test, category_names):
     
