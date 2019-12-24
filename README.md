@@ -5,7 +5,7 @@ This project is aimed at analyzing messages sent by the people who need help dur
 
 One of the major problems is identifying the right authority to send the request to. This web app can help the disaster agencies and citizens to find the right emergency/disaster theme real-time so that the request can be directed to the right authority and can be responded in a timely manner.
 
-### Files
+### Files:
 The repository contains all the necessary files in three folders -
 
 * Data (ETL phase) - It contains following files:
@@ -22,7 +22,7 @@ The repository contains all the necessary files in three folders -
   * templates: folder containing html files (master.html and go.html)
 
 
-### Pipeline & App
+### Pipeline & App:
 This web app (made using Flask) uses real disaster messages data from Figure Eight. I created a machine learning pipeline to categorize these messages using several machine learning models and NLTK. The app also displays visualization of the training data.
 
 
