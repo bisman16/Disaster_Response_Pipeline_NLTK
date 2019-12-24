@@ -1,9 +1,19 @@
+# Importing libraries
 import sys
 import pandas as pd
 from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
+     """Load dataframe from filepaths
+     
+    Parameters:
+    messages_filepath (str): link to the file
+    categories_filepath(str): link to the file
+    
+    Returns:
+    df - pandas DataFrame
+    """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = messages.merge(categories, on='id')
@@ -11,6 +21,15 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df): 
+    
+    """Clean and transform the data
+    
+    Parameters:
+    df -- DataFrame
+    
+    Returns:
+    df -- cleaned DataFrame
+    """
     categories = df['categories'].str.split(";", expand=True)
     row = categories.iloc[0]
     category_colnames = row.apply(lambda x: x.split('-')[0])
@@ -33,11 +52,20 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+    """Saves df to a database file path
+    Parameters:
+    df -- DataFrame
+    
+    """
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('disaster_messages', engine, index=False)
 
 
 def main():
+    """Runs main functions: 
+        Load, clean and save the data in a database
+    
+    """
     if len(sys.argv) == 4:
 
         messages_filepath, categories_filepath, database_filepath = sys.argv[1:]
